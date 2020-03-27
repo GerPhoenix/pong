@@ -1,0 +1,6 @@
+numpy
+keras-rl2
+pygame
+gym
+
+# Tested with Python 3.7 64 Bit
