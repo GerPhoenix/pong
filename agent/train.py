@@ -24,7 +24,7 @@ obs_dim = env.observation_space.shape[0]
 # deep network
 model = Sequential()
 model.add(Flatten(input_shape=(1,) + env.observation_space.shape))
-model.add(Dense(128))
+model.add(Dense(256))
 model.add(Activation('relu'))
 model.add(Dense(128))
 model.add(Activation('relu'))
@@ -37,40 +37,25 @@ try:
     model.load_weights("data/dqn_pong_params.h5f")
 except:
     print("No saved weights found")
+
 # Finally, we configure and compile our agent. You can use every built-in tensorflow.keras optimizer and
 # even the metrics!
 memory = SequentialMemory(limit=100000, window_length=1)
-policy = DecayingEpsGreedyQPolicy(eps=0.35)
-dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=1000,
-               target_model_update=0.05, policy=policy)
-dqn.compile(Adam(lr=1e-2), metrics=['mae'])
-
 cp_callback = ModelCheckpoint(filepath="data/dqn_pong_params.h5f",
                               save_weights_only=True,
                               verbose=1)
-dqn.fit(env, nb_steps=15000, verbose=2, visualize=False, callbacks=[cp_callback])
 
-policy = DecayingEpsGreedyQPolicy(eps=0.2)
-dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=1000,
-               target_model_update=0.035, policy=policy)
-dqn.compile(Adam(lr=1e-2), metrics=['mae'])
-dqn.fit(env, nb_steps=30000, verbose=2, visualize=False, callbacks=[cp_callback])
 
-policy = DecayingEpsGreedyQPolicy(eps=0.1)
-dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=1000,
-               target_model_update=0.02, policy=policy)
-dqn.compile(Adam(lr=1e-3), metrics=['mae'])
-# Okay, now it's time to learn something using the fit function! You can visualize the training here, but this
-# slows down training quite a lot.
-# You can abort the training without much progress being lost if the cp_callback is bound
-#
-dqn.fit(env, nb_steps=30000, verbose=2, visualize=False, callbacks=[cp_callback])
+def train(learn_rate, adam_learn_rate, epsilon, steps):
+    policy = DecayingEpsGreedyQPolicy(eps=epsilon)
+    dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=1000,
+                   target_model_update=learn_rate, policy=policy, gamma=.9999)
+    dqn.compile(Adam(lr=adam_learn_rate), metrics=['mae'])
+    dqn.fit(env, nb_steps=steps, verbose=2, visualize=False, callbacks=[cp_callback])
+    dqn.save_weights("data/dqn_pong_params.h5f", overwrite=True)
 
-policy = DecayingEpsGreedyQPolicy(eps=0.05)
-dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=1000,
-               target_model_update=1e-2, policy=policy)
-dqn.compile(Adam(lr=1e-3), metrics=['mae'])
-dqn.fit(env, nb_steps=25000, verbose=2, visualize=False, callbacks=[cp_callback])
 
-# After training is done, we save the best weights.
-dqn.save_weights("data/dqn_pong_params.h5f", overwrite=True)
+train(0.05, 1e-2, 0.35, 10000)
+train(0.03, 1e-3, 0.2, 20000)
+train(0.02, 1e-3, 0.1, 40000)
+train(1e-2, 1e-3, 0.05, 80000)

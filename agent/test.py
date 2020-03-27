@@ -26,7 +26,7 @@ obs_dim = env.observation_space.shape[0]
 # deep network
 model = Sequential()
 model.add(Flatten(input_shape=(1,) + env.observation_space.shape))
-model.add(Dense(128))
+model.add(Dense(256))
 model.add(Activation('relu'))
 model.add(Dense(128))
 model.add(Activation('relu'))

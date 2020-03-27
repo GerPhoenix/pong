@@ -162,9 +162,11 @@ class PongEnv(gym.Env):
     def calculate_reward(self, old_score, action):
         reward = 0
         # penalty for being not close to the ball
-        reward = -min((abs(self.get_ball_x_position() - self.get_platform_x_position()) - 5), 40)
-        if action != 0 or self.previous_action != action:
-            reward -= 50
+        reward = -min(max((abs(self.get_ball_x_position() - self.get_platform_x_position())), 50), 30)
+        if self.previous_action != action:
+            reward -= 1000
+        else:
+            reward += 10
         # if ball was missed add penalty
         if self.episode_over:
             reward = -20000
