@@ -15,8 +15,6 @@ PLATFORM_X_DEFAULT = 350
 PLATFORM_VELOCITY = 7
 BALL_VELOCITY_X = 42
 BALL_VELOCITY_Y = 14
-# BALL_VELOCITY_X = np.random.randint(400) / 400.0 + 8
-# BALL_VELOCITY_Y = np.random.randint(400) / 400.0 + 8
 
 BALL_SIZE = 15
 PLATFORM_SIZE_X = 100
@@ -29,11 +27,10 @@ class PongEnv(gym.Env):
     # metadata = {'render.modes': ['human']}
 
     def __init__(self):
-
         # ENV INIT
         self.previous_action = 0
         self.action_space = spaces.Discrete(3)
-        self.observation_space = spaces.Box(0, 800, shape=(7,), dtype=np.float32)
+        self.observation_space = spaces.Box(0, 800, shape=(5,), dtype=np.float32)
 
         # Init by reset
         self.screen = None
@@ -52,7 +49,7 @@ class PongEnv(gym.Env):
         self.ball_y = 560
         # velocity of the ball
         # Random direction by x_ball_velocity
-        self.ball_change_x = (np.random.randint(0, 2) * 2 - 1) * BALL_VELOCITY_X / np.random.randint(1, BALL_VELOCITY_X)
+        self.ball_change_x = (np.random.randint(0, 2) * 2 - 1) * np.random.randint(1, BALL_VELOCITY_X * 100) / 100
         self.ball_change_y = -BALL_VELOCITY_Y
 
         # flag for end of episode (reset to start position)
@@ -79,9 +76,8 @@ class PongEnv(gym.Env):
 
     def pack_observation(self):
         return np.array(
-            [self.platform_x, self.ball_x, abs(self.ball_change_x), self.ball_y, abs(self.ball_change_y),
-             0 if self.ball_change_x < 0 else 1,
-             0 if self.ball_change_y < 0 else 1])
+            [self.get_platform_x_position(), self.get_ball_x_position(), self.ball_change_x, self.ball_y,
+             self.ball_change_y])
 
     def reset(self):
         self.platform_x = PLATFORM_X_DEFAULT
@@ -93,7 +89,7 @@ class PongEnv(gym.Env):
         self.ball_y = 560
         # velocity of the ball
         # Random direction by x_ball_velocity
-        self.ball_change_x = (np.random.randint(0, 2) * 2 - 1) * BALL_VELOCITY_X / np.random.randint(1, BALL_VELOCITY_X)
+        self.ball_change_x = (np.random.randint(0, 2) * 2 - 1) * np.random.randint(1, BALL_VELOCITY_X * 100) / 100
         self.ball_change_y = -BALL_VELOCITY_Y
 
         self.score = 0
