@@ -57,11 +57,11 @@ def training_phase(learn_rate, adam_learn_rate, epsilon, decay, steps):
     dqn.save_weights(SAVEFILE_FOLDER + "/dqn_pong_params.h5f", overwrite=True)
 
 
-# for _ in range(2):
-#     training_phase(0.1, 1e-3, 0.7, 0, 100000)
-#     training_phase(0.8, 1e-3, 0.5, 0, 50000)
-#     training_phase(0.5, 1e-3, 0.3, 0, 20000)
-while True:
-    training_phase(0.05, 1e-3, 0.35, 0, 100000)
-    training_phase(0.03, 1e-3, 0.25, 0, 50000)
-    training_phase(0.02, 1e-3, 0.1, 0, 20000)
+for _ in range(3):
+    training_phase(0.1, 1e-3, 0.7, 0, 100000)
+    training_phase(0.8, 1e-3, 0.5, 0, 50000)
+    training_phase(0.5, 1e-3, 0.3, 0, 20000)
+# while True:
+#     training_phase(0.05, 1e-3, 0.35, 0, 100000)
+#     training_phase(0.03, 1e-3, 0.25, 0, 50000)
+#     training_phase(0.02, 1e-3, 0.1, 0, 20000)

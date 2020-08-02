@@ -13,7 +13,7 @@ Y_DIMENSION = 600
 SIZE = (X_DIMENSION, Y_DIMENSION)
 PLATFORM_X_DEFAULT = 350
 PLATFORM_VELOCITY = 7
-BALL_VELOCITY_X = 14
+BALL_VELOCITY_X = 42
 BALL_VELOCITY_Y = 14
 # BALL_VELOCITY_X = np.random.randint(400) / 400.0 + 8
 # BALL_VELOCITY_Y = np.random.randint(400) / 400.0 + 8
@@ -155,8 +155,6 @@ class PongEnv(gym.Env):
             self.ball_y = PLATFORM_Y_DEFAULT - self.ball_change_y
             self.ball_change_x = (self.get_ball_x_position() - self.get_platform_x_position()) \
                                  / PLATFORM_SIZE_X * BALL_VELOCITY_X * 2
-            print((self.get_ball_x_position() - self.get_platform_x_position()) \
-                  / PLATFORM_SIZE_X)
             self.ball_change_y = self.ball_change_y * -1
             self.score += 1
         elif self.ball_y > PLATFORM_Y_DEFAULT + self.ball_change_y:
