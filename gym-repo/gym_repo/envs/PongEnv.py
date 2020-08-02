@@ -154,10 +154,12 @@ class PongEnv(gym.Env):
                 and PLATFORM_Y_DEFAULT - PLATFORM_SIZE_Y < self.ball_y < PLATFORM_Y_DEFAULT:
             self.ball_y = PLATFORM_Y_DEFAULT - self.ball_change_y
             self.ball_change_x = (self.get_ball_x_position() - self.get_platform_x_position()) \
-                                 / PLATFORM_SIZE_X * BALL_VELOCITY_X
+                                 / PLATFORM_SIZE_X * BALL_VELOCITY_X * 2
+            print((self.get_ball_x_position() - self.get_platform_x_position()) \
+                  / PLATFORM_SIZE_X)
             self.ball_change_y = self.ball_change_y * -1
             self.score += 1
-        elif self.ball_y > PLATFORM_Y_DEFAULT:
+        elif self.ball_y > PLATFORM_Y_DEFAULT + self.ball_change_y:
             self.episode_over = True
 
     def get_ball_x_position(self):
