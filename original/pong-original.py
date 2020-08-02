@@ -23,11 +23,11 @@ rect_change_y = 0
 
 # initial position of the ball
 ball_x = 50
-ball_y = 50
+ball_y = 560
 
 # speed of the ball
-ball_change_x = 5
-ball_change_y = 5
+ball_change_x = 14
+ball_change_y = -14
 
 score = 0
 
@@ -113,7 +113,7 @@ while not done:
     elif ball_y < 0:
         ball_y = 0
         ball_change_y = ball_change_y * -1
-    elif ball_x > rect_x and ball_x < rect_x + 100 and ball_y == 565:
+    elif ball_x > rect_x and ball_x < rect_x + 100 and 560 < ball_y < 570:
         ball_change_y = ball_change_y * -1
         score = score + 1
     elif ball_y > 600:

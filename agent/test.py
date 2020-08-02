@@ -1,7 +1,6 @@
 import sys
 
 import gym
-import numpy as np
 from rl.agents import DQNAgent
 from rl.memory import SequentialMemory
 from tensorflow.compat.v1 import disable_eager_execution
@@ -11,14 +10,12 @@ from tensorflow.keras.optimizers import Adam
 
 from agent.policies.decaying_epsilon_q_greedy import DecayingEpsGreedyQPolicy
 
-LEARN = True
 ENV_NAME = 'gym_repo:pong-v0'
+SAVEFILE_FOLDER = "data/" + "32x32x32new"
 
 disable_eager_execution()
 # Get the environment and extract the number of actions.
 env = gym.make(ENV_NAME)
-np.random.seed(123)
-env.seed(123)
 
 nb_actions = env.action_space.n
 obs_dim = env.observation_space.shape[0]
@@ -26,17 +23,17 @@ obs_dim = env.observation_space.shape[0]
 # deep network
 model = Sequential()
 model.add(Flatten(input_shape=(1,) + env.observation_space.shape))
-model.add(Dense(256))
+model.add(Dense(32))
 model.add(Activation('relu'))
-model.add(Dense(128))
+model.add(Dense(32))
 model.add(Activation('relu'))
-model.add(Dense(128))
+model.add(Dense(32))
 model.add(Activation('relu'))
 model.add(Dense(nb_actions))
 model.add(Activation('linear'))
 print(model.summary())
 try:
-    model.load_weights("data/dqn_pong_params.h5f")
+    model.load_weights(SAVEFILE_FOLDER + "/dqn_pong_params.h5f")
 except:
     print("No saved weights found")
 # Finally, we configure and compile our agent. You can use every built-in tensorflow.keras optimizer and
