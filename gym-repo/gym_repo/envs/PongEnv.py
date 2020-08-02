@@ -11,7 +11,6 @@ BLUE = (0, 0, 255)
 X_DIMENSION = 800
 Y_DIMENSION = 600
 SIZE = (X_DIMENSION, Y_DIMENSION)
-PLATFORM_X_DEFAULT = 350
 PLATFORM_VELOCITY = 7
 BALL_VELOCITY_X = 42
 BALL_VELOCITY_Y = 14
@@ -39,7 +38,7 @@ class PongEnv(gym.Env):
         # STATES
         self.score = 0
         # Starting coordinates of the paddle
-        self.platform_x = PLATFORM_X_DEFAULT
+        self.platform_x = np.random.randint(X_DIMENSION - PLATFORM_SIZE_X)
         self.platform_y = PLATFORM_Y_DEFAULT
         # initial velocity of the paddle
         self.platform_change_x = 0
@@ -49,7 +48,8 @@ class PongEnv(gym.Env):
         self.ball_y = 560
         # velocity of the ball
         # Random direction by x_ball_velocity
-        self.ball_change_x = (np.random.randint(0, 2) * 2 - 1) * np.random.randint(1, BALL_VELOCITY_X * 100) / 100
+        self.ball_change_x = (np.random.randint(0, 2) * 2 - 1) * np.random.randint((BALL_VELOCITY_X - 10) * 100,
+                                                                                   BALL_VELOCITY_X * 100) / 100
         self.ball_change_y = -BALL_VELOCITY_Y
 
         # flag for end of episode (reset to start position)
@@ -80,7 +80,7 @@ class PongEnv(gym.Env):
              self.ball_change_y])
 
     def reset(self):
-        self.platform_x = PLATFORM_X_DEFAULT
+        self.platform_x = np.random.randint(X_DIMENSION - PLATFORM_SIZE_X)
         self.platform_y = PLATFORM_Y_DEFAULT
         # initial velocity of the paddle
         self.platform_change_x = 0
@@ -89,7 +89,8 @@ class PongEnv(gym.Env):
         self.ball_y = 560
         # velocity of the ball
         # Random direction by x_ball_velocity
-        self.ball_change_x = (np.random.randint(0, 2) * 2 - 1) * np.random.randint(1, BALL_VELOCITY_X * 100) / 100
+        self.ball_change_x = (np.random.randint(0, 2) * 2 - 1) * np.random.randint((BALL_VELOCITY_X - 10) * 100,
+                                                                                   BALL_VELOCITY_X * 100) / 100
         self.ball_change_y = -BALL_VELOCITY_Y
 
         self.score = 0
@@ -123,8 +124,8 @@ class PongEnv(gym.Env):
         self.platform_y += self.platform_change_y
         if self.platform_x < 0:
             self.platform_x = 0
-        if self.platform_x > 699:
-            self.platform_x = 699
+        if self.platform_x >= X_DIMENSION - PLATFORM_SIZE_X:
+            self.platform_x = X_DIMENSION - PLATFORM_SIZE_X - 1
 
     def draw_platform(self):
         pygame.draw.rect(self.screen, RED, [self.platform_x, self.platform_y, PLATFORM_SIZE_X, PLATFORM_SIZE_Y])

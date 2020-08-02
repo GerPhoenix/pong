@@ -51,17 +51,29 @@ cp_callback = ModelCheckpoint(filepath=SAVEFILE_FOLDER + "/dqn_pong_params.h5f",
 def training_phase(learn_rate, adam_learn_rate, epsilon, decay, steps):
     policy = DecayingEpsGreedyQPolicy(eps=epsilon, decay=decay)
     dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=1000,
-                   target_model_update=learn_rate, policy=policy, gamma=.99)
+                   target_model_update=learn_rate, policy=policy, gamma=.999)
     dqn.compile(Adam(lr=adam_learn_rate), metrics=['mae'])
     dqn.fit(env, nb_steps=steps, verbose=2, visualize=VISUALIZE, callbacks=[cp_callback])
     dqn.save_weights(SAVEFILE_FOLDER + "/dqn_pong_params.h5f", overwrite=True)
 
 
-for _ in range(3):
-    training_phase(0.1, 1e-3, 0.7, 0, 100000)
-    training_phase(0.8, 1e-3, 0.5, 0, 50000)
-    training_phase(0.5, 1e-3, 0.3, 0, 20000)
-# while True:
-#     training_phase(0.05, 1e-3, 0.35, 0, 100000)
-#     training_phase(0.03, 1e-3, 0.25, 0, 50000)
-#     training_phase(0.02, 1e-3, 0.1, 0, 20000)
+i = 0
+# print("Iteration: ", i)
+# for _ in range(2):
+#     training_phase(0.1, 1e-3, 0.9, 0, 100000)
+#     training_phase(0.08, 1e-3, 0.8, 0, 50000)
+#     training_phase(0.05, 1e-3, 0.7, 0, 50000)
+#     i += 1
+#     print("Iteration: ", i)
+# for _ in range(2):
+#     training_phase(0.08, 1e-3, 0.7, 0, 100000)
+#     training_phase(0.05, 1e-3, 0.5, 0, 50000)
+#     training_phase(0.03, 1e-3, 0.4, 0, 50000)
+#     i += 1
+#     print("Iteration: ", i)
+for _ in range(2):
+    training_phase(0.05, 1e-3, 0.35, 0, 100000)
+    training_phase(0.03, 1e-3, 0.25, 0, 50000)
+    training_phase(0.02, 1e-3, 0.1, 0, 50000)
+    i += 1
+    print("Iteration: ", i)
