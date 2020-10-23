@@ -12,7 +12,7 @@ X_DIMENSION = 800
 Y_DIMENSION = 600
 SIZE = (X_DIMENSION, Y_DIMENSION)
 PLATFORM_VELOCITY = 7
-BALL_VELOCITY_X = 42
+BALL_VELOCITY_X = 28
 BALL_VELOCITY_Y = 14
 
 BALL_SIZE = 15
@@ -48,8 +48,8 @@ class PongEnv(gym.Env):
         self.ball_y = 560
         # velocity of the ball
         # Random direction by x_ball_velocity
-        self.ball_change_x = (np.random.randint(0, 2) * 2 - 1) * np.random.randint((BALL_VELOCITY_X - 10) * 100,
-                                                                                   BALL_VELOCITY_X * 100) / 100
+        self.ball_change_x = (np.random.randint(0, 2) * 2 - 1) * np.random.randint(BALL_VELOCITY_X - 10,
+                                                                                   BALL_VELOCITY_X)
         self.ball_change_y = -BALL_VELOCITY_Y
 
         # flag for end of episode (reset to start position)
@@ -76,7 +76,7 @@ class PongEnv(gym.Env):
 
     def pack_observation(self):
         return np.array(
-            [self.get_platform_x_position(), self.get_ball_x_position(), self.ball_change_x, self.ball_y,
+            [self.get_platform_x(), self.get_ball_x(), self.ball_change_x, self.ball_y,
              self.ball_change_y])
 
     def reset(self):
@@ -89,10 +89,9 @@ class PongEnv(gym.Env):
         self.ball_y = 560
         # velocity of the ball
         # Random direction by x_ball_velocity
-        self.ball_change_x = (np.random.randint(0, 2) * 2 - 1) * np.random.randint((BALL_VELOCITY_X - 10) * 100,
-                                                                                   BALL_VELOCITY_X * 100) / 100
+        self.ball_change_x = (np.random.randint(0, 2) * 2 - 1) * np.random.randint(BALL_VELOCITY_X - 10,
+                                                                                   BALL_VELOCITY_X)
         self.ball_change_y = -BALL_VELOCITY_Y
-
         self.score = 0
         # flag for end of episode (reset to start position)
         self.episode_over = False
@@ -146,39 +145,31 @@ class PongEnv(gym.Env):
         if self.ball_y < 0:
             self.ball_y = 0
             self.ball_change_y = self.ball_change_y * -1
-        elif -(BALL_SIZE / 2) + self.platform_x < self.get_ball_x_position() < \
+        elif -(BALL_SIZE / 2) + self.platform_x < self.get_ball_x() < \
                 self.platform_x + PLATFORM_SIZE_X + BALL_SIZE / 2 \
                 and PLATFORM_Y_DEFAULT - PLATFORM_SIZE_Y < self.ball_y < PLATFORM_Y_DEFAULT:
             self.ball_y = PLATFORM_Y_DEFAULT - self.ball_change_y
-            self.ball_change_x = (self.get_ball_x_position() - self.get_platform_x_position()) \
+            self.ball_change_x = (self.get_ball_x() - self.get_platform_x()) \
                                  / PLATFORM_SIZE_X * BALL_VELOCITY_X * 2
             self.ball_change_y = self.ball_change_y * -1
             self.score += 1
         elif self.ball_y > PLATFORM_Y_DEFAULT + self.ball_change_y:
             self.episode_over = True
 
-    def get_ball_x_position(self):
+    def get_ball_x(self):
         # Add half the ball_size because the render will be to the right
         return self.ball_x + BALL_SIZE / 2
 
-    def get_platform_x_position(self):
+    def get_platform_x(self):
         # Add half of the platform length because the render will be to the right
         return self.platform_x + PLATFORM_SIZE_X / 2
 
     def calculate_reward(self, old_score, action):
         reward = 0
-        # penalty for being not close to the ball
-        # reward = -min(max((abs(self.get_ball_x_position() - self.get_platform_x_position())), 50), 10) * 10
+        # penalty for doing different actions (smoothing movements)
         if self.previous_action != action:
-            reward -= 500
-        else:
-            reward = 0
-        if action != 0:
-            reward -= 100
-        # if ball was missed apply penalty
-        if self.episode_over and not old_score < self.score:
-            reward = -100000
-        # if ball was caught apply reward
-        if old_score < self.score:
-            reward = 100000
+            reward -= 1
+        # if ball was missed apply penalty, if ball was caught apply reward
+        if self.episode_over or old_score < self.score:
+            reward = 1 / max(abs(self.get_ball_x() - self.get_platform_x()), 1)
         return reward
